@@ -1,17 +1,17 @@
-package com.yintianyan.tallybook.screens.homescreen.view
+package com.yintianyan.tallybook.components.datepicker
 
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.yintianyan.tallybook.components.BottomSheetPopup
-import com.yintianyan.tallybook.components.DatePicker
-import com.yintianyan.tallybook.components.DatePickerMode
+import com.yintianyan.tallybook.theme.Gray
+import com.yintianyan.tallybook.theme.PrimaryBlue
+import com.yintianyan.tallybook.theme.White
 import java.time.LocalDate
 
 /**
@@ -20,8 +20,9 @@ import java.time.LocalDate
  * @param show 是否显示模态框
  * @param mode 选择器模式
  * @param selectedDate 选中的日期
- * @param onDateSelected 日期选择回调
+ * @param onDateSelected 日期选择回调 (year, month, day)
  * @param onDismiss 关闭模态框回调
+ * @param title 标题
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -30,14 +31,15 @@ fun DatePickerModal(
     mode: DatePickerMode,
     selectedDate: LocalDate,
     onDateSelected: (Int, Int, Int) -> Unit,
-    onDismiss: () -> Unit
+    onDismiss: () -> Unit,
+    title: String = "选择日期"
 ) {
-    val title = @Composable {
+    val titleComposable = @Composable {
         Text(
-            text = "选择日期",
+            text = title,
             fontSize = 18.sp,
             fontWeight = FontWeight.Bold,
-            color = MaterialTheme.colorScheme.onSurface
+            color = Gray
         )
     }
 
@@ -49,7 +51,7 @@ fun DatePickerModal(
             Text(
                 text = "取消",
                 fontSize = 14.sp,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
+                color = Gray
             )
         }
     }
@@ -63,8 +65,8 @@ fun DatePickerModal(
             modifier = Modifier.fillMaxWidth(),
             shape = RoundedCornerShape(8.dp),
             colors = ButtonDefaults.buttonColors(
-                containerColor = MaterialTheme.colorScheme.primary,
-                contentColor = MaterialTheme.colorScheme.onPrimary
+                containerColor = PrimaryBlue,
+                contentColor = White
             )
         ) {
             Text(
@@ -78,7 +80,7 @@ fun DatePickerModal(
     BottomSheetPopup(
         show = show,
         onDismiss = onDismiss,
-        title = title,
+        title = titleComposable,
         confirmButton = confirmButton,
         dismissButton = dismissButton,
         shape = RoundedCornerShape(
@@ -88,7 +90,7 @@ fun DatePickerModal(
         disableDragDismiss = true
     ) {
         // 日期选择器
-        DatePicker(
+        WheelDatePicker(
             mode = mode,
             defaultValue = selectedDate,
             onChange = { date ->
@@ -97,7 +99,8 @@ fun DatePickerModal(
             },
             modifier = Modifier
                 .fillMaxWidth()
-                .height(200.dp)
+                // 移除固定高度，允许 DatePicker 根据 visibleItemsCount 决定高度
+                // 默认 DatePicker 高度 = 48.dp * 5 = 240.dp
         )
     }
 }

@@ -41,7 +41,7 @@ fun BottomSheetPopup(
     confirmButton: (@Composable () -> Unit)? = null,
     dismissButton: (@Composable () -> Unit)? = null,
     shape: Shape = MaterialTheme.shapes.large,
-    containerColor: androidx.compose.ui.graphics.Color = MaterialTheme.colorScheme.surface,
+    containerColor: androidx.compose.ui.graphics.Color = com.yintianyan.tallybook.theme.White,
     disableDragDismiss: Boolean = false,
     content: @Composable () -> Unit
 ) {
@@ -117,14 +117,14 @@ fun DialogPopup(
     confirmButton: (@Composable () -> Unit)? = null,
     dismissButton: (@Composable () -> Unit)? = null,
     shape: Shape = MaterialTheme.shapes.medium,
-    containerColor: androidx.compose.ui.graphics.Color = MaterialTheme.colorScheme.surface,
+    containerColor: androidx.compose.ui.graphics.Color = com.yintianyan.tallybook.theme.White,
     content: (@Composable () -> Unit)? = null
 ) {
     if (show) {
         AlertDialog(
             onDismissRequest = onDismiss,
             title = title,
-            text = if (content != null) content else text,
+            text = content ?: text,
             confirmButton = confirmButton ?: {},
             dismissButton = dismissButton ?: {},
             shape = shape,
@@ -162,7 +162,7 @@ fun GenericPopup(
     } else {
         MaterialTheme.shapes.medium
     },
-    containerColor: androidx.compose.ui.graphics.Color = MaterialTheme.colorScheme.surface,
+    containerColor: androidx.compose.ui.graphics.Color = com.yintianyan.tallybook.theme.White,
     content: @Composable () -> Unit
 ) {
     when (type) {

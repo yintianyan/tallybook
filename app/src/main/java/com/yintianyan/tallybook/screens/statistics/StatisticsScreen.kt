@@ -17,8 +17,8 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.yintianyan.tallybook.components.DatePickerMode
-import com.yintianyan.tallybook.screens.homescreen.view.DatePickerModal
+import com.yintianyan.tallybook.components.datepicker.DatePickerModal
+import com.yintianyan.tallybook.components.datepicker.DatePickerMode
 import com.yintianyan.tallybook.screens.statistics.viewmodel.StatisticsViewModel
 import com.yintianyan.tallybook.theme.*
 import java.time.LocalDate

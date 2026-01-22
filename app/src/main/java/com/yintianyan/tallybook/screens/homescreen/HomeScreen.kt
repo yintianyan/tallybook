@@ -13,14 +13,15 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.yintianyan.tallybook.components.DatePickerMode
+import com.yintianyan.tallybook.components.datepicker.DatePickerModal
+import com.yintianyan.tallybook.components.datepicker.DatePickerMode
 import com.yintianyan.tallybook.routes.*
 import com.yintianyan.tallybook.screens.homescreen.view.*
 import com.yintianyan.tallybook.screens.homescreen.viewmodel.HomeViewModel
 import com.yintianyan.tallybook.screens.homescreen.viewmodel.formatAmount
 import com.yintianyan.tallybook.theme.*
-import java.time.LocalDate
 
+import java.time.LocalDate
 /**
  * 首页主组件
  * 
@@ -31,7 +32,7 @@ import java.time.LocalDate
  * - TransactionList: 交易列表
  * - FilterDialog: 筛选对话框
  * - AddTransactionModal: 添加交易的底部弹窗
- * - MonthPickerModal: 月份选择的底部弹窗
+ * - DatePickerModal: 日期选择的底部弹窗
  * 
  * 使用HomeViewModel管理所有状态和业务逻辑
  */
