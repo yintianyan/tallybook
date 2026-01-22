@@ -21,19 +21,12 @@ import com.yintianyan.tallybook.routes.TransactionType
 import com.yintianyan.tallybook.screens.homescreen.viewmodel.formatAmount
 import com.yintianyan.tallybook.screens.homescreen.viewmodel.formatAmountWithSign
 import com.yintianyan.tallybook.theme.*
-
-
-/**
- * 交易列表组件，显示按日期分组的交易记录
- * 合并了TransactionList和TransactionCard的功能
- * @param transactionsByDate 按日期分组的交易记录
- * @param modifier 修饰符
- */
 import androidx.compose.material3.SwipeToDismissBox
 import androidx.compose.material3.SwipeToDismissBoxValue
 import androidx.compose.material3.rememberSwipeToDismissBoxState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
+
 
 /**
  * 交易列表组件，显示按日期分组的交易记录
