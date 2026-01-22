@@ -41,9 +41,13 @@ class HomeViewModel(private val context: Context) {
     // 添加交易页面状态
     var showAddTransactionScreen by mutableStateOf(false)
     
-    // 数据状态
-    var transactions by mutableStateOf<List<Transaction>>(emptyList())
+    // 加载状态
+    var isLoading by mutableStateOf(false)
+    
+    // 数据状态 - 源数据（本月所有交易）
     var currentMonthTransactions by mutableStateOf<List<Transaction>>(emptyList())
+    
+    // 刷新触发器
     var refreshTrigger by mutableIntStateOf(0)
     
     // 数据库访问
@@ -56,15 +60,21 @@ class HomeViewModel(private val context: Context) {
         String.format("%d-%02d", selectedYear, selectedMonthValue)
     }
     
-    // 过滤后的交易数据
-    val filteredTransactions by derivedStateOf { transactions }
+    // 过滤后的交易数据 - 基于源数据和筛选条件实时计算
+    val transactions by derivedStateOf { 
+        currentMonthTransactions.filter { transaction ->
+            val typeMatch = selectedType == TransactionType.ALL || transaction.type == selectedType
+            val categoryMatch = selectedCategory == TransactionCategory.ALL || transaction.category == selectedCategory
+            typeMatch && categoryMatch
+        }
+    }
     
     // 按日期分组的交易数据
     val transactionsByDate by derivedStateOf { 
-        filteredTransactions.groupBy { it.date }
+        transactions.groupBy { it.date }
     }
     
-    // 本月收入和支出统计
+    // 本月收入和支出统计 - 始终基于本月所有数据统计，不受筛选影响
     val monthlyIncome by derivedStateOf { 
         currentMonthTransactions
             .filter { it.type == TransactionType.INCOME }
@@ -132,69 +142,31 @@ class HomeViewModel(private val context: Context) {
         // 直接构建当前月份字符串，避免依赖derivedStateOf的计算时机
         val monthString = String.format("%d-%02d", selectedYear, selectedMonthValue)
         
-        // 调试日志
-        Log.d("HomeViewModel", "loadData called with:")
-        Log.d("HomeViewModel", "  selectedType: $selectedType")
-        Log.d("HomeViewModel", "  selectedCategory: $selectedCategory")
-        Log.d("HomeViewModel", "  monthString: $monthString")
+        isLoading = true
         
-        // 加载筛选后的交易数据
+        // 调试日志
+        Log.d("HomeViewModel", "loadData called for month: $monthString")
+        
+        // 加载本月所有交易数据
         coroutineScope.launch {
             try {
-                // 根据筛选条件和月份加载数据
-                val entities = when {
-                    selectedType == TransactionType.ALL && selectedCategory == TransactionCategory.ALL -> {
-                        // 查询指定月份的所有交易记录
-                        transactionDao.getCurrentMonthTransactions(monthString)
-                    }
-                    selectedType == TransactionType.ALL -> {
-                        // 查询指定月份的特定分类交易记录
-                        transactionDao.getCurrentMonthTransactions(monthString)
-                            .filter { it.category == selectedCategory.name }
-                    }
-                    selectedCategory == TransactionCategory.ALL -> {
-                        // 查询指定月份的特定类型交易记录
-                        transactionDao.getCurrentMonthTransactions(monthString)
-                            .filter { it.type == selectedType.name }
-                    }
-                    else -> {
-                        // 查询指定月份、特定类型和分类的交易记录
-                        transactionDao.getCurrentMonthTransactions(monthString)
-                            .filter { it.type == selectedType.name && it.category == selectedCategory.name }
-                    }
-                }
-                
-                // 调试日志：查看数据库查询结果
-                Log.d("HomeViewModel", "  Entities count: ${entities.size}")
+                // 查询指定月份的所有交易记录
+                val entities = transactionDao.getCurrentMonthTransactions(monthString)
                 
                 // 转换为Transaction类型
                 val transactionsList = entities.map { it.toTransaction() }
-                Log.d("HomeViewModel", "  Transactions count: ${transactionsList.size}")
+                Log.d("HomeViewModel", "  Loaded ${transactionsList.size} transactions")
                 
                 // 在主线程更新状态
                 withContext(Dispatchers.Main) {
-                    transactions = transactionsList
-                }
-            } catch (e: Exception) {
-                e.printStackTrace()
-                withContext(Dispatchers.Main) {
-                    transactions = emptyList()
-                }
-            }
-        }
-        
-        // 加载本月所有交易数据（用于计算总收入和支出）
-        coroutineScope.launch {
-            try {
-                val entities = transactionDao.getCurrentMonthTransactions(monthString)
-                val currentMonthTransactionsList = entities.map { it.toTransaction() }
-                withContext(Dispatchers.Main) {
-                    currentMonthTransactions = currentMonthTransactionsList
+                    currentMonthTransactions = transactionsList
+                    isLoading = false
                 }
             } catch (e: Exception) {
                 e.printStackTrace()
                 withContext(Dispatchers.Main) {
                     currentMonthTransactions = emptyList()
+                    isLoading = false
                 }
             }
         }
@@ -216,6 +188,32 @@ class HomeViewModel(private val context: Context) {
     fun refreshData() {
         refreshTrigger += 1
         loadData()
+    }
+    
+    /**
+     * 删除交易记录
+     */
+    fun deleteTransaction(transaction: Transaction) {
+        coroutineScope.launch {
+            try {
+                // 转换回 Entity 进行删除
+                val entity = TransactionEntity(
+                    id = transaction.id,
+                    date = transaction.date,
+                    time = transaction.time,
+                    category = transaction.category.name,
+                    type = transaction.type.name,
+                    amount = transaction.amount,
+                    description = transaction.description
+                )
+                transactionDao.deleteTransaction(entity)
+                
+                // 刷新数据
+                refreshData()
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+        }
     }
     
     /**

@@ -41,6 +41,10 @@ fun HomeScreen() {
     val context = LocalContext.current
     val viewModel = remember { HomeViewModel(context) }
 
+    // 删除弹窗状态
+    var showDeleteDialog by remember { mutableStateOf(false) }
+    var transactionToDelete by remember { mutableStateOf<Transaction?>(null) }
+
     Scaffold(
         floatingActionButton = { 
             FloatingActionButton(
@@ -76,13 +80,63 @@ fun HomeScreen() {
                 )
 
                 // 交易列表 - 使用简化的stickyHeader实现
-                TransactionList(
-                    transactionsByDate = viewModel.transactionsByDate,
-                    modifier = Modifier.weight(1f)
-                )
+                Box(modifier = Modifier.weight(1f)) {
+                    TransactionList(
+                        transactionsByDate = viewModel.transactionsByDate,
+                        modifier = Modifier.fillMaxSize(),
+                        onDelete = { transaction ->
+                            transactionToDelete = transaction
+                            showDeleteDialog = true
+                        }
+                    )
+                    
+                    if (viewModel.isLoading) {
+                        Box(
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .background(White.copy(alpha = 0.5f)),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            CircularProgressIndicator(color = PrimaryBlue)
+                        }
+                    }
+                }
             }
         }
     )
+
+    // 确认删除弹窗
+    if (showDeleteDialog && transactionToDelete != null) {
+        DialogPopup(
+            show = showDeleteDialog,
+            onDismiss = { 
+                showDeleteDialog = false 
+                transactionToDelete = null
+            },
+            title = { Text("确认删除") },
+            text = { Text("确定要删除这条记录吗？此操作无法撤销。") },
+            confirmButton = {
+                Button(
+                    onClick = {
+                        transactionToDelete?.let { viewModel.deleteTransaction(it) }
+                        showDeleteDialog = false
+                        transactionToDelete = null
+                    },
+                    colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error)
+                ) {
+                    Text("删除")
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { 
+                    showDeleteDialog = false 
+                    transactionToDelete = null
+                }) {
+                    Text("取消")
+                }
+            }
+        )
+    }
 
     // 筛选对话框
     FilterDialog(
@@ -94,15 +148,12 @@ fun HomeScreen() {
         onTypeChange = { type -> 
             viewModel.selectedType = type
             viewModel.selectedCategory = TransactionCategory.ALL
-            viewModel.refreshData()
         },
         onCategoryChange = { category -> 
             viewModel.selectedCategory = category
-            viewModel.refreshData()
         },
         onReset = { 
             viewModel.resetFilters()
-            viewModel.refreshData()
         }
     )
 
@@ -116,7 +167,7 @@ fun HomeScreen() {
     // 月份选择器弹出动画
     DatePickerModal(
         show = viewModel.showMonthPicker,
-        mode = DatePickerMode.DATE,
+        mode = DatePickerMode.MONTH,
         selectedDate = LocalDate.of(viewModel.selectedYear, viewModel.selectedMonthValue, 1),
         onDateSelected = { year, month, _ ->
             viewModel.setSelectedMonth(year, month)
