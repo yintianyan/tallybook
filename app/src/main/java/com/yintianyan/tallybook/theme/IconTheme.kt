@@ -1,6 +1,8 @@
 package com.yintianyan.tallybook.theme
 
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.*
+import androidx.compose.material.icons.automirrored.outlined.*
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material.icons.outlined.*
 import androidx.compose.material3.MaterialTheme
@@ -21,8 +23,8 @@ val MaterialTheme.icons: AppIcons
 object AppIcons {
     // 底部导航栏图标
     object Navigation {
-        val home = Icons.Outlined.List
-        val statistics = Icons.Outlined.List
+        val home = Icons.AutoMirrored.Outlined.List
+        val statistics = Icons.AutoMirrored.Outlined.List
         val profile = Icons.Outlined.AccountCircle
     }
     
@@ -37,10 +39,10 @@ object AppIcons {
     
     // 月份选择器图标
     object MonthPicker {
-        val arrowLeft = Icons.Default.KeyboardArrowLeft
-        val arrowRight = Icons.Default.KeyboardArrowRight
-        val arrowLeftFilled = Icons.Default.KeyboardArrowLeft
-        val arrowRightFilled = Icons.Default.KeyboardArrowRight
+        val arrowLeft = Icons.AutoMirrored.Filled.KeyboardArrowLeft
+        val arrowRight = Icons.AutoMirrored.Filled.KeyboardArrowRight
+        val arrowLeftFilled = Icons.AutoMirrored.Filled.KeyboardArrowLeft
+        val arrowRightFilled = Icons.AutoMirrored.Filled.KeyboardArrowRight
         val arrowUpFilled = Icons.Default.KeyboardArrowUp
         val arrowDownFilled = Icons.Default.KeyboardArrowDown
     }
@@ -64,10 +66,10 @@ object AppIcons {
             val hotel = Icons.Default.Hotel
             val beauty = Icons.Default.Face
             val humanRelations = Icons.Default.People
-            val transfer = Icons.Default.SwapHoriz
-            val sendRedPacket = Icons.Default.Send
+            val transfer = Icons.AutoMirrored.Filled.Sort
+            val sendRedPacket = Icons.AutoMirrored.Filled.Send
             val insurance = Icons.Default.Security
-            val other = Icons.Default.MoreHoriz
+            val other = Icons.AutoMirrored.Filled.List
         }
         
         // 收入分类
@@ -75,7 +77,7 @@ object AppIcons {
             val salary = Icons.Default.AccountBalanceWallet
             val bonus = Icons.Default.AttachMoney
             val receiveRedPacket = Icons.Default.CardGiftcard
-            val receiveTransfer = Icons.Default.SwapHoriz
+            val receiveTransfer = Icons.AutoMirrored.Filled.Sort
             val otherHumanRelations = Icons.Default.People
             val other = Icons.Default.AddCircleOutline
         }

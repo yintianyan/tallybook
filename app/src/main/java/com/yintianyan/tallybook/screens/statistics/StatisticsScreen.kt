@@ -384,7 +384,7 @@ fun CategoryStatisticsItem(
         }
         
         if (!isLast) {
-            Divider(
+            HorizontalDivider(
                 color = LightGray,
                 thickness = 1.dp,
                 modifier = Modifier.padding(horizontal = 16.dp)
