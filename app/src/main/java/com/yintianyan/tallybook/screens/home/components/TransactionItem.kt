@@ -19,6 +19,7 @@ import com.yintianyan.tallybook.routes.Transaction
 import com.yintianyan.tallybook.routes.TransactionCategory
 import com.yintianyan.tallybook.routes.TransactionType
 import com.yintianyan.tallybook.utils.formatAmountWithSign
+import com.yintianyan.tallybook.utils.getCategoryIconColor
 import com.yintianyan.tallybook.theme.*
 
 @Composable
@@ -50,37 +51,7 @@ fun TransactionItem(
                         contentAlignment = Alignment.Center
                     ) {
                         // 使用category.icon直接获取图标
-                        val tintColor = when (transaction.category) {
-                            // 支出分类
-                            TransactionCategory.FOOD -> TagOrange
-                            TransactionCategory.TRANSPORT -> TagBlue
-                            TransactionCategory.SHOPPING -> TagPurple
-                            TransactionCategory.ENTERTAINMENT -> TagYellow
-                            TransactionCategory.EDUCATION -> TagGreen
-                            TransactionCategory.CLOTHING -> TagOrange
-                            TransactionCategory.SPORTS -> TagYellow
-                            TransactionCategory.PET -> TagPurple
-                            TransactionCategory.MEDICAL -> TagBlue
-                            TransactionCategory.LIVING_BILLS -> Gray
-                            TransactionCategory.RED_PACKET -> ExpenseText
-                            TransactionCategory.CHILDREN -> TagPurple
-                            TransactionCategory.HOTEL -> TagBlue
-                            TransactionCategory.BEAUTY -> TagYellow
-                            TransactionCategory.HUMAN_RELATIONS -> TagGreen
-                            TransactionCategory.TRANSFER -> TagBlue
-                            TransactionCategory.SEND_RED_PACKET -> ExpenseText
-                            TransactionCategory.INSURANCE -> TagGreen
-                            TransactionCategory.EXPENSE_OTHER -> Gray
-                            // 收入分类
-                            TransactionCategory.SALARY -> IncomeText
-                            TransactionCategory.BONUS -> TagYellow
-                            TransactionCategory.RECEIVE_RED_PACKET -> IncomeText
-                            TransactionCategory.RECEIVE_TRANSFER -> IncomeText
-                            TransactionCategory.OTHER_HUMAN_RELATIONS -> IncomeText
-                            TransactionCategory.INCOME_OTHER -> Gray
-                            // 默认情况
-                            else -> TagBlue
-                        }
+                        val tintColor = transaction.category.getCategoryIconColor()
                         
                         Icon(
                             transaction.category.icon,

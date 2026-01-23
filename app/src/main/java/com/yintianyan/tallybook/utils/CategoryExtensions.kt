@@ -2,6 +2,7 @@ package com.yintianyan.tallybook.utils
 
 import androidx.compose.ui.graphics.Color
 import com.yintianyan.tallybook.routes.TransactionCategory
+import com.yintianyan.tallybook.theme.*
 
 // 添加扩展函数，统一处理分类颜色映射
 fun TransactionCategory.getCategoryColor(): Color {
@@ -38,31 +39,35 @@ fun TransactionCategory.getCategoryColor(): Color {
 // 添加扩展函数，统一处理分类图标颜色
 fun TransactionCategory.getCategoryIconColor(): Color {
     return when (this) {
-        TransactionCategory.FOOD -> Color(0xFF00BCD4)
-        TransactionCategory.TRANSPORT -> Color(0xFF4CAF50)
-        TransactionCategory.SHOPPING -> Color(0xFF9C27B0)
-        TransactionCategory.ENTERTAINMENT -> Color(0xFFE91E63)
-        TransactionCategory.EDUCATION -> Color(0xFFFBC02D)
-        TransactionCategory.CLOTHING -> Color(0xFF2196F3)
-        TransactionCategory.SPORTS -> Color(0xFF3F51B5)
-        TransactionCategory.PET -> Color(0xFF795548)
-        TransactionCategory.MEDICAL -> Color(0xFFF44336)
-        TransactionCategory.LIVING_BILLS -> Color(0xFFFF5722)
-        TransactionCategory.RED_PACKET -> Color(0xFFFF9800)
-        TransactionCategory.CHILDREN -> Color(0xFF8BC34A)
-        TransactionCategory.HOTEL -> Color(0xFF673AB7)
-        TransactionCategory.BEAUTY -> Color(0xFFE91E63)
-        TransactionCategory.HUMAN_RELATIONS -> Color(0xFF9C27B0)
-        TransactionCategory.TRANSFER -> Color(0xFF3F51B5)
-        TransactionCategory.SEND_RED_PACKET -> Color(0xFFFFC107)
-        TransactionCategory.INSURANCE -> Color(0xFF00BCD4)
-        TransactionCategory.EXPENSE_OTHER -> Color(0xFF757575)
-        TransactionCategory.SALARY -> Color(0xFF4CAF50)
-        TransactionCategory.BONUS -> Color(0xFFFFC107)
-        TransactionCategory.RECEIVE_RED_PACKET -> Color(0xFFE91E63)
-        TransactionCategory.RECEIVE_TRANSFER -> Color(0xFF2196F3)
-        TransactionCategory.OTHER_HUMAN_RELATIONS -> Color(0xFF9C27B0)
-        TransactionCategory.INCOME_OTHER -> Color(0xFF757575)
-        TransactionCategory.ALL -> Color(0xFF757575)
+        // 支出分类
+        TransactionCategory.FOOD -> TagOrange
+        TransactionCategory.TRANSPORT -> TagBlue
+        TransactionCategory.SHOPPING -> TagPurple
+        TransactionCategory.ENTERTAINMENT -> TagYellow
+        TransactionCategory.EDUCATION -> TagGreen
+        TransactionCategory.CLOTHING -> TagOrange
+        TransactionCategory.SPORTS -> TagYellow
+        TransactionCategory.PET -> TagPurple
+        TransactionCategory.MEDICAL -> TagBlue
+        TransactionCategory.LIVING_BILLS -> Gray
+        TransactionCategory.RED_PACKET -> ExpenseText
+        TransactionCategory.CHILDREN -> TagPurple
+        TransactionCategory.HOTEL -> TagBlue
+        TransactionCategory.BEAUTY -> TagYellow
+        TransactionCategory.HUMAN_RELATIONS -> TagGreen
+        TransactionCategory.TRANSFER -> TagBlue
+        TransactionCategory.SEND_RED_PACKET -> ExpenseText
+        TransactionCategory.INSURANCE -> TagGreen
+        TransactionCategory.EXPENSE_OTHER -> Gray
+        // 收入分类
+        TransactionCategory.SALARY -> IncomeText
+        TransactionCategory.BONUS -> TagYellow
+        TransactionCategory.RECEIVE_RED_PACKET -> IncomeText
+        TransactionCategory.RECEIVE_TRANSFER -> IncomeText
+        TransactionCategory.OTHER_HUMAN_RELATIONS -> IncomeText
+        TransactionCategory.INCOME_OTHER -> Gray
+        // 默认情况
+        else -> TagBlue
     }
 }
+
