@@ -102,7 +102,6 @@ fun DraggableFloatingActionButton(
                     onClick()
                 }
             },
-            text = text,
             containerColor = PrimaryBlue,
             contentColor = White,
             modifier = modifier
@@ -154,6 +153,8 @@ fun DraggableFloatingActionButton(
                         }
                     }
                 }
-        )
+        ) {
+            text()
+        }
     }
 }
