@@ -18,7 +18,7 @@ import androidx.navigation.compose.rememberNavController
 import com.yintianyan.tallybook.model.database.TallyBookDatabase
 import com.yintianyan.tallybook.routes.NavRoutes
 import com.yintianyan.tallybook.components.AppBottomNavigation
-import com.yintianyan.tallybook.screens.homescreen.HomeScreen
+import com.yintianyan.tallybook.screens.home.HomeScreen
 import com.yintianyan.tallybook.screens.profile.ProfileScreen
 import com.yintianyan.tallybook.screens.statistics.StatisticsScreen
 import com.yintianyan.tallybook.theme.TallyBookTheme
@@ -30,10 +30,10 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         
         // 在应用启动时插入示例数据
-        lifecycleScope.launch {
-            val database = TallyBookDatabase.getDatabase(applicationContext)
-            TallyBookDatabase.insertSampleData(database)
-        }
+        // lifecycleScope.launch {
+        //     val database = TallyBookDatabase.getDatabase(applicationContext)
+        //     TallyBookDatabase.insertSampleData(database)
+        // }
         
         setContent {
             TallyBookTheme {

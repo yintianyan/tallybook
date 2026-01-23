@@ -1,4 +1,4 @@
-package com.yintianyan.tallybook.screens.homescreen.view
+package com.yintianyan.tallybook.screens.home.components
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
@@ -12,7 +12,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.yintianyan.tallybook.routes.TransactionCategory
 import com.yintianyan.tallybook.routes.TransactionType
-import com.yintianyan.tallybook.screens.homescreen.viewmodel.HomeViewModel
+import com.yintianyan.tallybook.screens.home.HomeViewModel
 import com.yintianyan.tallybook.theme.*
 
 import com.yintianyan.tallybook.components.DialogPopup

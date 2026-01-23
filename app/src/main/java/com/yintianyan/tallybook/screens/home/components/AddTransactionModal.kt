@@ -1,4 +1,4 @@
-package com.yintianyan.tallybook.screens.homescreen.view
+package com.yintianyan.tallybook.screens.home.components
 
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable

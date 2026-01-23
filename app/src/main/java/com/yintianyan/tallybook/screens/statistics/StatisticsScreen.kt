@@ -21,13 +21,18 @@ import com.yintianyan.tallybook.components.datepicker.DatePickerModal
 import com.yintianyan.tallybook.components.datepicker.DatePickerMode
 import com.yintianyan.tallybook.screens.statistics.viewmodel.StatisticsViewModel
 import com.yintianyan.tallybook.theme.*
+import com.yintianyan.tallybook.utils.formatAmount
+import com.yintianyan.tallybook.data.repository.TransactionRepositoryImpl
+import com.yintianyan.tallybook.model.database.TallyBookDatabase
 import java.time.LocalDate
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun StatisticsScreen() {
     val context = LocalContext.current
-    val viewModel = remember { StatisticsViewModel(context) }
+    val database = remember { TallyBookDatabase.getDatabase(context) }
+    val repository = remember { TransactionRepositoryImpl(database.transactionDao()) }
+    val viewModel = remember { StatisticsViewModel(repository) }
     
     Scaffold(
         topBar = {
@@ -431,9 +436,3 @@ fun MonthlyTrendCard() {
     }
 }
 
-/**
- * 金额格式化函数
- */
-fun Double.formatAmount(): String {
-    return String.format("¥%,.2f", this)
-}

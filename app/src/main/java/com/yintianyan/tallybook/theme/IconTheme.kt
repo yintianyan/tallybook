@@ -49,35 +49,35 @@ object AppIcons {
     object Categories {
         // 支出分类
         object Expense {
-            val food = Icons.Default.Home
-            val transport = Icons.Default.Settings
+            val food = Icons.Default.Restaurant
+            val transport = Icons.Default.DirectionsCar
             val shopping = Icons.Default.ShoppingCart
-            val entertainment = Icons.Default.Star
-            val education = Icons.Default.Search
-            val clothing = Icons.Default.Favorite
-            val sports = Icons.Default.Menu
-            val pet = Icons.Default.Phone
-            val medical = Icons.Default.Share
-            val livingBills = Icons.Default.Email
-            val redPacket = Icons.Default.Edit
-            val children = Icons.Default.Add
-            val hotel = Icons.Default.Check
-            val beauty = Icons.Default.Favorite
-            val humanRelations = Icons.Default.Phone
-            val transfer = Icons.Default.Share
+            val entertainment = Icons.Default.Movie
+            val education = Icons.Default.School
+            val clothing = Icons.Default.Checkroom
+            val sports = Icons.Default.SportsBasketball
+            val pet = Icons.Default.Pets
+            val medical = Icons.Default.LocalHospital
+            val livingBills = Icons.Default.Receipt
+            val redPacket = Icons.Default.CardGiftcard
+            val children = Icons.Default.ChildCare
+            val hotel = Icons.Default.Hotel
+            val beauty = Icons.Default.Face
+            val humanRelations = Icons.Default.People
+            val transfer = Icons.Default.SwapHoriz
             val sendRedPacket = Icons.Default.Send
-            val insurance = Icons.Default.Star
-            val other = Icons.Default.Settings
+            val insurance = Icons.Default.Security
+            val other = Icons.Default.MoreHoriz
         }
         
         // 收入分类
         object Income {
-            val salary = Icons.Default.Check
-            val bonus = Icons.Default.Star
-            val receiveRedPacket = Icons.Default.Add
-            val receiveTransfer = Icons.Default.Share
-            val otherHumanRelations = Icons.Default.Phone
-            val other = Icons.Default.Email
+            val salary = Icons.Default.AccountBalanceWallet
+            val bonus = Icons.Default.AttachMoney
+            val receiveRedPacket = Icons.Default.CardGiftcard
+            val receiveTransfer = Icons.Default.SwapHoriz
+            val otherHumanRelations = Icons.Default.People
+            val other = Icons.Default.AddCircleOutline
         }
     }
     

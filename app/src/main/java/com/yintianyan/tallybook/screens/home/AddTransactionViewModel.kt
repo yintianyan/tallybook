@@ -1,11 +1,10 @@
-package com.yintianyan.tallybook.screens.homescreen.viewmodel
+package com.yintianyan.tallybook.screens.home
 
-import android.content.Context
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
-import com.yintianyan.tallybook.model.database.TallyBookDatabase
-import com.yintianyan.tallybook.model.entity.TransactionEntity
+import com.yintianyan.tallybook.data.repository.TransactionRepository
+import com.yintianyan.tallybook.routes.Transaction
 import com.yintianyan.tallybook.routes.TransactionCategory
 import com.yintianyan.tallybook.routes.TransactionType
 import kotlinx.coroutines.CoroutineScope
@@ -16,8 +15,9 @@ import java.util.*
 
 /**
  * AddTransactionViewModel 管理添加交易屏幕的状态和业务逻辑
+ * @param repository 交易数据仓库
  */
-class AddTransactionViewModel(private val context: Context) {
+class AddTransactionViewModel(private val repository: TransactionRepository) {
 
     // 交易类型和分类状态
     var selectedType by mutableStateOf(TransactionType.EXPENSE)
@@ -36,9 +36,7 @@ class AddTransactionViewModel(private val context: Context) {
     var showTimePicker by mutableStateOf(false)
     var showRemarkDialog by mutableStateOf(false)
 
-    // 数据库
-    private val database = TallyBookDatabase.getDatabase(context)
-    private val transactionDao = database.transactionDao()
+    // 协程作用域
     private val coroutineScope = CoroutineScope(Dispatchers.Main)
 
     // 初始化分类
@@ -149,16 +147,16 @@ class AddTransactionViewModel(private val context: Context) {
 
         coroutineScope.launch {
             try {
-                val transactionEntity = TransactionEntity(
+                val transaction = Transaction(
                     id = 0, // 自动生成
                     date = currentDate,
                     time = currentTime,
-                    category = selectedCategory.name,
-                    type = selectedType.name,
+                    category = selectedCategory,
+                    type = selectedType,
                     amount = transactionAmount,
                     description = remark
                 )
-                transactionDao.insertTransaction(transactionEntity)
+                repository.insertTransaction(transaction)
                 onSuccess()
             } catch (e: Exception) {
                 onError(e)

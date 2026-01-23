@@ -1,7 +1,7 @@
 // HomeHeader.kt
 // 首页顶部标题栏组件
 
-package com.yintianyan.tallybook.screens.homescreen.view
+package com.yintianyan.tallybook.screens.home.components
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable

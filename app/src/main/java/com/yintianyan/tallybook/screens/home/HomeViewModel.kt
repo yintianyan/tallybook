@@ -1,14 +1,11 @@
 // HomeViewModel.kt
 // 首页视图模型，负责管理首页的状态、数据加载和业务逻辑
 
-package com.yintianyan.tallybook.screens.homescreen.viewmodel
+package com.yintianyan.tallybook.screens.home
 
-import android.content.Context
 import android.util.Log
 import androidx.compose.runtime.*
-import com.yintianyan.tallybook.model.dao.TransactionDao
-import com.yintianyan.tallybook.model.database.TallyBookDatabase
-import com.yintianyan.tallybook.model.entity.TransactionEntity
+import com.yintianyan.tallybook.data.repository.TransactionRepository
 import com.yintianyan.tallybook.routes.Transaction
 import com.yintianyan.tallybook.routes.TransactionCategory
 import com.yintianyan.tallybook.routes.TransactionType
@@ -22,9 +19,9 @@ import java.util.Calendar
 
 /**
  * HomeViewModel 管理首页的所有状态和业务逻辑
- * @param context 应用上下文，用于数据库访问
+ * @param repository 交易数据仓库
  */
-class HomeViewModel(private val context: Context) {
+class HomeViewModel(private val repository: TransactionRepository) {
     // 筛选状态
     var selectedCategory by mutableStateOf(TransactionCategory.ALL)
     var selectedType by mutableStateOf(TransactionType.ALL)
@@ -50,9 +47,7 @@ class HomeViewModel(private val context: Context) {
     // 刷新触发器
     var refreshTrigger by mutableIntStateOf(0)
     
-    // 数据库访问
-    private val database = TallyBookDatabase.getDatabase(context)
-    private val transactionDao: TransactionDao = database.transactionDao()
+    // 协程作用域
     private val coroutineScope = CoroutineScope(Dispatchers.IO)
     
     // 当前月份字符串（格式：YYYY-MM）
@@ -151,10 +146,8 @@ class HomeViewModel(private val context: Context) {
         coroutineScope.launch {
             try {
                 // 查询指定月份的所有交易记录
-                val entities = transactionDao.getCurrentMonthTransactions(monthString)
+                val transactionsList = repository.getCurrentMonthTransactions(monthString)
                 
-                // 转换为Transaction类型
-                val transactionsList = entities.map { it.toTransaction() }
                 Log.d("HomeViewModel", "  Loaded ${transactionsList.size} transactions")
                 
                 // 在主线程更新状态
@@ -196,17 +189,7 @@ class HomeViewModel(private val context: Context) {
     fun deleteTransaction(transaction: Transaction) {
         coroutineScope.launch {
             try {
-                // 转换回 Entity 进行删除
-                val entity = TransactionEntity(
-                    id = transaction.id,
-                    date = transaction.date,
-                    time = transaction.time,
-                    category = transaction.category.name,
-                    type = transaction.type.name,
-                    amount = transaction.amount,
-                    description = transaction.description
-                )
-                transactionDao.deleteTransaction(entity)
+                repository.deleteTransaction(transaction)
                 
                 // 刷新数据
                 refreshData()
@@ -243,32 +226,3 @@ class HomeViewModel(private val context: Context) {
     }
 }
 
-/**
- * 金额格式化函数
- */
-fun Double.formatAmount(): String {
-    return String.format("¥%,.2f", this)
-}
-
-/**
- * 带符号的金额格式化函数
- */
-fun Double.formatAmountWithSign(type: TransactionType): String {
-    val formatted = String.format("%,.2f", this)
-    return if (type == TransactionType.INCOME) "+¥$formatted" else "-¥$formatted"
-}
-
-/**
- * 转换函数：将TransactionEntity转换为Transaction
- */
-fun TransactionEntity.toTransaction(): Transaction {
-    return Transaction(
-        id = id,
-        date = date,
-        time = time,
-        category = TransactionCategory.valueOf(category),
-        type = TransactionType.valueOf(type),
-        amount = amount,
-        description = description
-    )
-}

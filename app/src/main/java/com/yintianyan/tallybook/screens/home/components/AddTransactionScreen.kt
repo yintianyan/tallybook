@@ -1,4 +1,4 @@
-package com.yintianyan.tallybook.screens.homescreen.view
+package com.yintianyan.tallybook.screens.home.components
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -21,7 +21,8 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.foundation.border
 import com.yintianyan.tallybook.model.database.TallyBookDatabase
-import com.yintianyan.tallybook.model.entity.TransactionEntity
+import com.yintianyan.tallybook.data.repository.TransactionRepositoryImpl
+import com.yintianyan.tallybook.routes.Transaction
 import com.yintianyan.tallybook.routes.TransactionCategory
 import com.yintianyan.tallybook.routes.TransactionType
 import com.yintianyan.tallybook.constants.CategoryConstants
@@ -67,7 +68,7 @@ fun AddTransactionScreen(
     // 获取数据库实例
     val context = LocalContext.current
     val database = remember { TallyBookDatabase.getDatabase(context) }
-    val transactionDao = remember { database.transactionDao() }
+    val repository = remember { TransactionRepositoryImpl(database.transactionDao()) }
     val coroutineScope = rememberCoroutineScope()
     
     // 当交易类型改变时，自动更新分类为对应类型的默认分类
@@ -97,16 +98,16 @@ fun AddTransactionScreen(
         
         coroutineScope.launch {
             try {
-                val transactionEntity = TransactionEntity(
+                val transaction = Transaction(
                     id = 0, // 自动生成
                     date = currentDate,
                     time = currentTime,
-                    category = selectedCategory.name, // 将枚举转换为String
-                    type = selectedType.name, // 将枚举转换为String
+                    category = selectedCategory,
+                    type = selectedType,
                     amount = transactionAmount,
                     description = remark
                 )
-                transactionDao.insertTransaction(transactionEntity)
+                repository.insertTransaction(transaction)
                 onTransactionAdded() // 通知父组件数据已更新
             } catch (e: Exception) {
                 // 捕获数据库操作和数据转换异常，避免应用闪退

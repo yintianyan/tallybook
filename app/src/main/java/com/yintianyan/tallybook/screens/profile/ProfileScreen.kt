@@ -5,23 +5,33 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
-import androidx.compose.ui.draw.clip
-
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.yintianyan.tallybook.theme.*
+import com.yintianyan.tallybook.model.database.TallyBookDatabase
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
+import android.widget.Toast
+import androidx.compose.foundation.clickable
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Delete
 
 @Composable
 fun ProfileScreen() {
+    val context = LocalContext.current
+    val coroutineScope = rememberCoroutineScope()
+    val database = TallyBookDatabase.getDatabase(context)
+    val transactionDao = database.transactionDao()
+
     LazyColumn(
         modifier = Modifier
             .fillMaxSize()
@@ -113,6 +123,19 @@ fun ProfileScreen() {
                         icon = MaterialTheme.icons.info,
                         title = "帮助与反馈"
                     )
+                    // 临时删除数据按钮
+                    SettingItem(
+                        icon = Icons.Default.Delete,
+                        title = "清除所有数据（开发用）",
+                        onClick = {
+                            coroutineScope.launch(Dispatchers.IO) {
+                                transactionDao.deleteAllTransactions()
+                                withContext(Dispatchers.Main) {
+                                    Toast.makeText(context, "所有数据已清除", Toast.LENGTH_SHORT).show()
+                                }
+                            }
+                        }
+                    )
                 }
             }
         }
@@ -138,11 +161,13 @@ fun ProfileScreen() {
 @Composable
 fun SettingItem(
     icon: androidx.compose.ui.graphics.vector.ImageVector,
-    title: String
+    title: String,
+    onClick: () -> Unit = {}
 ) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
+            .clickable(onClick = onClick)
             .padding(16.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {

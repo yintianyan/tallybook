@@ -75,17 +75,48 @@ fun WheelDatePicker(
 
     // 监听内部状态变化并回调
     LaunchedEffect(selectedYear, selectedMonth, selectedDay) {
+        // 限制日期不能超过当前日期
+        val now = LocalDate.now()
         val daysInMonth = YearMonth.of(selectedYear, selectedMonth).lengthOfMonth()
-        val actualDay = selectedDay.coerceAtMost(daysInMonth)
-
-        // 如果日期需要被修正（例如从31号切到小月），则先更新内部状态
-        // 修正后的状态会在下一次 recomposition 后通过这个 LaunchedEffect 触发回调
-        if (selectedDay != actualDay) {
-            selectedDay = actualDay
-        } else {
-            val newDate = LocalDate.of(selectedYear, selectedMonth, actualDay)
-            currentOnChange(newDate)
+        val tempDate = try {
+             LocalDate.of(selectedYear, selectedMonth, selectedDay.coerceAtMost(daysInMonth))
+        } catch (e: Exception) {
+             now
         }
+
+        val finalDate = if (tempDate.isAfter(now)) now else tempDate
+
+        // 如果计算出的日期与当前选中的不一致（无论是天数溢出还是超过今天），都修正状态
+        if (finalDate.year != selectedYear || finalDate.monthValue != selectedMonth || finalDate.dayOfMonth != selectedDay) {
+            selectedYear = finalDate.year
+            selectedMonth = finalDate.monthValue
+            selectedDay = finalDate.dayOfMonth
+        } else {
+            currentOnChange(finalDate)
+        }
+    }
+    
+    // 动态计算可选范围
+    val now = LocalDate.now()
+    // 年份列表：最小年份 ~ (如果当前年份 < maxYear，则取当前年份，否则取 maxYear)
+    // 这里假设 maxYear 传入的是当前年份，如果允许选未来，则需要调整
+    // 但根据需求，是"以当前日期为基准"，所以最大年份不应超过 now.year
+    val actualMaxYear = if (maxYear > now.year) now.year else maxYear
+    val years = (minYear..actualMaxYear).toList()
+    
+    // 月份列表：如果选中当前年，则月份限制为 1~now.monthValue；否则 1~12
+    val months = if (selectedYear == now.year) {
+        (1..now.monthValue).toList()
+    } else {
+        (1..12).toList()
+    }
+    
+    // 日期列表：如果选中当前年且当前月，则日期限制为 1~now.dayOfMonth；否则 1~当月天数
+    val daysInMonth = YearMonth.of(selectedYear, selectedMonth).lengthOfMonth()
+    val days = if (selectedYear == now.year && selectedMonth == now.monthValue) {
+        (1..now.dayOfMonth).toList()
+    } else {
+        (1..daysInMonth).toList()
     }
 
     Row(
@@ -102,7 +133,7 @@ fun WheelDatePicker(
         ) {
             HeaderLabel("年")
             PickerColumn(
-                items = (minYear..maxYear).toList(),
+                items = years,
                 selectedItem = selectedYear,
                 onItemSelected = { selectedYear = it },
                 visibleItemsCount = visibleItemsCount,
@@ -119,7 +150,7 @@ fun WheelDatePicker(
             ) {
                 HeaderLabel("月")
                 PickerColumn(
-                    items = (1..12).toList(),
+                    items = months,
                     selectedItem = selectedMonth,
                     onItemSelected = { selectedMonth = it },
                     visibleItemsCount = visibleItemsCount,
@@ -136,10 +167,9 @@ fun WheelDatePicker(
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 HeaderLabel("日")
-                val daysInMonth = YearMonth.of(selectedYear, selectedMonth).lengthOfMonth()
                 PickerColumn(
-                    items = (1..daysInMonth).toList(),
-                    selectedItem = selectedDay.coerceAtMost(daysInMonth),
+                    items = days,
+                    selectedItem = selectedDay.coerceAtMost(days.last()), // 确保选中项在范围内，虽然LaunchedEffect会修正，但这里显示也要正确
                     onItemSelected = { selectedDay = it },
                     visibleItemsCount = visibleItemsCount,
                     itemFormatter = { "${it.toString().padStart(2, '0')}日" },

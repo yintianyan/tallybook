@@ -1,4 +1,4 @@
-package com.yintianyan.tallybook.screens.homescreen
+package com.yintianyan.tallybook.screens.home
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -7,6 +7,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
@@ -15,14 +16,17 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.yintianyan.tallybook.components.datepicker.DatePickerModal
 import com.yintianyan.tallybook.components.datepicker.DatePickerMode
+import com.yintianyan.tallybook.components.DraggableFloatingActionButton
 import com.yintianyan.tallybook.components.DialogPopup
 import com.yintianyan.tallybook.routes.*
-import com.yintianyan.tallybook.screens.homescreen.view.*
-import com.yintianyan.tallybook.screens.homescreen.viewmodel.HomeViewModel
-import com.yintianyan.tallybook.screens.homescreen.viewmodel.formatAmount
+import com.yintianyan.tallybook.screens.home.components.*
+import com.yintianyan.tallybook.screens.home.HomeViewModel
+import com.yintianyan.tallybook.utils.formatAmount
 import com.yintianyan.tallybook.theme.*
-
+import com.yintianyan.tallybook.data.repository.TransactionRepositoryImpl
+import com.yintianyan.tallybook.model.database.TallyBookDatabase
 import java.time.LocalDate
+
 /**
  * 首页主组件
  * 
@@ -40,73 +44,75 @@ import java.time.LocalDate
 @Composable
 fun HomeScreen() {
     val context = LocalContext.current
-    val viewModel = remember { HomeViewModel(context) }
+    // 初始化 Repository 和 ViewModel
+    val database = remember { TallyBookDatabase.getDatabase(context) }
+    val repository = remember { TransactionRepositoryImpl(database.transactionDao()) }
+    val viewModel = remember { HomeViewModel(repository) }
 
     // 删除弹窗状态
     var showDeleteDialog by remember { mutableStateOf(false) }
     var transactionToDelete by remember { mutableStateOf<Transaction?>(null) }
 
-    Scaffold(
-        floatingActionButton = { 
-            FloatingActionButton(
-                onClick = { viewModel.showAddTransactionScreen = true },
-                containerColor = PrimaryBlue,
-                shape = CircleShape,
-                modifier = Modifier.offset(x = (-24).dp, y = (-24).dp)
-            ) {
-                Icon(MaterialTheme.icons.add, contentDescription = "添加", tint = White)
-            }
-        },
-        floatingActionButtonPosition = FabPosition.End,
-        content = {
-            Column(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .background(White)
-                    .padding(it)
-            ) {
-                // 顶部标题栏
-                HomeHeader(
-                    selectedMonth = viewModel.selectedMonth,
-                    onMonthClick = { viewModel.showMonthPicker = true }
-                )
-
-                // 收入支出概览卡片
-                BalanceOverviewCard(viewModel = viewModel)
-
-                // 筛选工具栏
-                FilterToolbar(
-                    filterText = viewModel.getFilterText(),
-                    onFilterClick = { viewModel.showFilterDialog = true }
-                )
-
-                // 交易列表 - 使用简化的stickyHeader实现
-                Box(modifier = Modifier.weight(1f)) {
-                    TransactionList(
-                        transactionsByDate = viewModel.transactionsByDate,
-                        modifier = Modifier.fillMaxSize(),
-                        onDelete = { transaction ->
-                            transactionToDelete = transaction
-                            showDeleteDialog = true
-                        }
+    Box(modifier = Modifier.fillMaxSize()) {
+        Scaffold(
+            // 移除原有FAB，改用自定义 Draggable FAB
+            content = {
+                Column(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .background(White)
+                        .padding(it)
+                ) {
+                    // 顶部标题栏
+                    HomeHeader(
+                        selectedMonth = viewModel.selectedMonth,
+                        onMonthClick = { viewModel.showMonthPicker = true }
                     )
-                    
-                    if (viewModel.isLoading) {
-                        Box(
-                            modifier = Modifier
-                                .fillMaxSize()
-                                .background(White.copy(alpha = 0.5f)),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            CircularProgressIndicator(color = PrimaryBlue)
+
+                    // 收入支出概览卡片
+                    BalanceOverviewCard(viewModel = viewModel)
+
+                    // 筛选工具栏
+                    FilterToolbar(
+                        filterText = viewModel.getFilterText(),
+                        onFilterClick = { viewModel.showFilterDialog = true }
+                    )
+
+                    // 交易列表 - 使用简化的stickyHeader实现
+                    Box(modifier = Modifier.weight(1f)) {
+                        TransactionList(
+                            transactionsByDate = viewModel.transactionsByDate,
+                            modifier = Modifier.fillMaxSize(),
+                            onDelete = { transaction ->
+                                transactionToDelete = transaction
+                                showDeleteDialog = true
+                            }
+                        )
+                        
+                        if (viewModel.isLoading) {
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxSize()
+                                    .background(White.copy(alpha = 0.5f)),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                CircularProgressIndicator(color = PrimaryBlue)
+                            }
                         }
                     }
                 }
             }
-        }
-    )
-
-    // 确认删除弹窗
+        )
+        
+        // Draggable FAB
+        DraggableFloatingActionButton(
+            onClick = { viewModel.showAddTransactionScreen = true },
+            icon = { Icon(MaterialTheme.icons.add, contentDescription = "添加") },
+            text = { Text("记一笔") }
+        )
+    }
+    
+    // ... (保持不变)
     if (showDeleteDialog && transactionToDelete != null) {
         DialogPopup(
             show = showDeleteDialog,
@@ -342,5 +348,3 @@ private fun BalanceOverviewCard(totalIncome: Double, totalExpense: Double) {
         }
     }
 }
-
-

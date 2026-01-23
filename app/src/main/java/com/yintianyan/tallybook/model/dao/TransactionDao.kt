@@ -85,4 +85,10 @@ interface TransactionDao {
      */
     @Query("SELECT * FROM transactions WHERE date LIKE :currentMonth || '%' ORDER BY date DESC, time DESC")
     suspend fun getCurrentMonthTransactions(currentMonth: String): List<TransactionEntity>
+    
+    /**
+     * 删除所有交易记录
+     */
+    @Query("DELETE FROM transactions")
+    suspend fun deleteAllTransactions()
 }

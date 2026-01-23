@@ -1,4 +1,4 @@
-package com.yintianyan.tallybook.screens.homescreen.view
+package com.yintianyan.tallybook.screens.home.components
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -18,8 +18,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.yintianyan.tallybook.screens.homescreen.viewmodel.HomeViewModel
-import com.yintianyan.tallybook.screens.homescreen.viewmodel.formatAmount
+import com.yintianyan.tallybook.screens.home.HomeViewModel
+import com.yintianyan.tallybook.utils.formatAmount
 import com.yintianyan.tallybook.theme.*
 
 /**

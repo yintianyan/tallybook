@@ -1,10 +1,7 @@
 package com.yintianyan.tallybook.screens.statistics.viewmodel
 
-import android.content.Context
 import androidx.compose.runtime.*
-import com.yintianyan.tallybook.model.dao.TransactionDao
-import com.yintianyan.tallybook.model.database.TallyBookDatabase
-import com.yintianyan.tallybook.model.entity.TransactionEntity
+import com.yintianyan.tallybook.data.repository.TransactionRepository
 import com.yintianyan.tallybook.routes.Transaction
 import com.yintianyan.tallybook.routes.TransactionCategory
 import com.yintianyan.tallybook.routes.TransactionType
@@ -17,8 +14,9 @@ import java.util.Calendar
 
 /**
  * 统计页面视图模型，负责管理统计页面的状态、数据加载和业务逻辑
+ * @param repository 交易数据仓库
  */
-class StatisticsViewModel(private val context: Context) {
+class StatisticsViewModel(private val repository: TransactionRepository) {
     // 月份选择状态
     var selectedMonth by mutableStateOf("2025年12月")
     var selectedYear by mutableIntStateOf(2025)
@@ -32,9 +30,7 @@ class StatisticsViewModel(private val context: Context) {
     var currentMonthTransactions by mutableStateOf<List<Transaction>>(emptyList())
     var isLoading by mutableStateOf(true)
     
-    // 数据库访问
-    private val database = TallyBookDatabase.getDatabase(context)
-    private val transactionDao: TransactionDao = database.transactionDao()
+    // 协程作用域
     private val coroutineScope = CoroutineScope(Dispatchers.IO)
     
     // 当前月份字符串（格式：YYYY-MM）
@@ -114,8 +110,7 @@ class StatisticsViewModel(private val context: Context) {
         coroutineScope.launch {
             try {
                 // 加载指定月份的所有交易数据
-                val entities = transactionDao.getCurrentMonthTransactions(monthString)
-                val transactionsList = entities.map { it.toTransaction() }
+                val transactionsList = repository.getCurrentMonthTransactions(monthString)
                 
                 withContext(Dispatchers.Main) {
                     currentMonthTransactions = transactionsList
@@ -157,33 +152,3 @@ data class CategoryStatistic(
     val amount: Double,
     val type: TransactionType
 )
-
-/**
- * 金额格式化函数
- */
-fun Double.formatAmount(): String {
-    return String.format("¥%,.2f", this)
-}
-
-/**
- * 带符号的金额格式化函数
- */
-fun Double.formatAmountWithSign(type: TransactionType): String {
-    val formatted = String.format("%,.2f", this)
-    return if (type == TransactionType.INCOME) "+¥$formatted" else "-¥$formatted"
-}
-
-/**
- * 转换函数：将TransactionEntity转换为Transaction
- */
-fun TransactionEntity.toTransaction(): Transaction {
-    return Transaction(
-        id = id,
-        date = date,
-        time = time,
-        category = TransactionCategory.valueOf(category),
-        type = TransactionType.valueOf(type),
-        amount = amount,
-        description = description
-    )
-}

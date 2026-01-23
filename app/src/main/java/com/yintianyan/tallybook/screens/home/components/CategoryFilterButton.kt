@@ -1,4 +1,4 @@
-package com.yintianyan.tallybook.screens.homescreen.view
+package com.yintianyan.tallybook.screens.home.components
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -11,51 +11,43 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.yintianyan.tallybook.routes.TransactionType
+import com.yintianyan.tallybook.constants.CategoryConstants
+import com.yintianyan.tallybook.routes.TransactionCategory
 import com.yintianyan.tallybook.theme.*
 
 /**
- * 交易类型筛选按钮组件
+ * 交易分类筛选按钮组件
  * 
- * @param type 交易类型（收入、支出或全部）
+ * @param category 交易分类
  * @param isSelected 是否被选中
  * @param onClick 点击事件回调
- * @param modifier 修饰符
  */
 @Composable
-fun TypeFilterButton(
-    type: TransactionType,
+fun CategoryFilterButton(
+    category: TransactionCategory,
     isSelected: Boolean,
-    onClick: () -> Unit,
-    modifier: Modifier = Modifier
+    onClick: () -> Unit
 ) {
     val backgroundColor = if (isSelected) PrimaryBlue else White
     val textColor = if (isSelected) White else DarkGray
     val borderColor = if (isSelected) PrimaryBlue else UnselectedTagBackground
     
-    val displayText = when (type) {
-        TransactionType.ALL -> "全部"
-        TransactionType.INCOME -> "收入"
-        TransactionType.EXPENSE -> "支出"
-    }
-    
     Box(
-        modifier = modifier
+        modifier = Modifier
             .clip(RoundedCornerShape(16.dp))
             .background(backgroundColor)
             .clickable(onClick = onClick)
             .border(1.dp, borderColor, RoundedCornerShape(16.dp))
-            .padding(12.dp),
+            .padding(horizontal = 16.dp, vertical = 8.dp),
         contentAlignment = Alignment.Center
     ) {
         Text(
-            text = displayText,
-            fontSize = 14.sp,
-            fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Medium,
+            text = CategoryConstants.CATEGORY_DISPLAY_NAME_MAP[category] ?: "其他",
+            fontSize = 12.sp,
+            fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal,
             color = textColor
         )
     }
