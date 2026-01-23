@@ -1,19 +1,13 @@
 package com.yintianyan.tallybook.components
 
 import androidx.compose.animation.core.Animatable
-import androidx.compose.animation.core.VectorConverter
 import androidx.compose.animation.core.spring
 import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.offset
-import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.ExtendedFloatingActionButton
-import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalDensity
@@ -21,13 +15,13 @@ import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import com.yintianyan.tallybook.theme.PrimaryBlue
 import com.yintianyan.tallybook.theme.White
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlin.math.roundToInt
 
 @Composable
 fun DraggableFloatingActionButton(
     onClick: () -> Unit,
-    icon: @Composable () -> Unit,
     text: @Composable () -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -43,8 +37,41 @@ fun DraggableFloatingActionButton(
     // 按钮尺寸
     var buttonSize by remember { mutableStateOf(androidx.compose.ui.unit.IntSize.Zero) }
     
-    // 初始位置标记
+    // 状态管理
     var isInitialized by remember { mutableStateOf(false) }
+    var isDocked by remember { mutableStateOf(false) }
+    var isDragging by remember { mutableStateOf(false) }
+    // 记录停靠在哪一侧 (true: Left, false: Right)
+    var isDockedLeft by remember { mutableStateOf(false) }
+
+    // 自动吸附逻辑
+    LaunchedEffect(isDragging, isDocked) {
+        if (!isDragging && !isDocked) {
+            delay(3000) // 3秒无操作自动吸附
+            isDocked = true
+        }
+    }
+
+    // 监听停靠状态变化，执行动画
+    LaunchedEffect(isDocked, parentSize, buttonSize) {
+        if (isInitialized && !isDragging) {
+            val parentWidth = parentSize.width.toFloat()
+            val buttonWidth = buttonSize.width.toFloat()
+            val padding = with(density) { 16.dp.toPx() }
+            val visibleWidth = with(density) { 12.dp.toPx() } // 吸附时露出的宽度
+
+            val targetX = if (isDockedLeft) {
+                if (isDocked) -buttonWidth + visibleWidth else padding
+            } else {
+                if (isDocked) parentWidth - visibleWidth else parentWidth - buttonWidth - padding
+            }
+
+            offsetX.animateTo(
+                targetValue = targetX,
+                animationSpec = spring(stiffness = androidx.compose.animation.core.Spring.StiffnessLow)
+            )
+        }
+    }
 
     Box(
         modifier = Modifier
@@ -68,8 +95,13 @@ fun DraggableFloatingActionButton(
             }
     ) {
         ExtendedFloatingActionButton(
-            onClick = onClick,
-            icon = icon,
+            onClick = {
+                if (isDocked) {
+                    isDocked = false
+                } else {
+                    onClick()
+                }
+            },
             text = text,
             containerColor = PrimaryBlue,
             contentColor = White,
@@ -77,20 +109,25 @@ fun DraggableFloatingActionButton(
                 .offset { IntOffset(offsetX.value.roundToInt(), offsetY.value.roundToInt()) }
                 .pointerInput(Unit) {
                     detectDragGestures(
+                        onDragStart = {
+                            isDragging = true
+                            isDocked = false
+                        },
                         onDragEnd = {
-                            // 吸附逻辑：吸附到最近的左右边缘
+                            isDragging = false
+                            // 计算吸附方向
                             val parentWidth = parentSize.width.toFloat()
                             val buttonWidth = buttonSize.width.toFloat()
                             val currentX = offsetX.value
                             
-                            // 左右边界 padding
-                            val padding = with(density) { 16.dp.toPx() }
+                            isDockedLeft = currentX + buttonWidth / 2 < parentWidth / 2
                             
-                            // 目标 X 坐标
-                            val targetX = if (currentX + buttonWidth / 2 < parentWidth / 2) {
-                                padding // 吸附到左边
+                            // 拖拽结束时，先吸附到展开位置
+                            val padding = with(density) { 16.dp.toPx() }
+                            val targetX = if (isDockedLeft) {
+                                padding
                             } else {
-                                parentWidth - buttonWidth - padding // 吸附到右边
+                                parentWidth - buttonWidth - padding
                             }
                             
                             // 限制 Y 轴范围

@@ -107,7 +107,6 @@ fun HomeScreen() {
         // Draggable FAB
         DraggableFloatingActionButton(
             onClick = { viewModel.showAddTransactionScreen = true },
-            icon = { Icon(MaterialTheme.icons.add, contentDescription = "添加") },
             text = { Text("记一笔") }
         )
     }
